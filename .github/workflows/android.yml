@@ -8,6 +8,10 @@ on:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: day-flow
+
     steps:
       - uses: actions/checkout@v4
 
@@ -55,4 +59,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dayflow-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: day-flow/android/app/build/outputs/apk/debug/app-debug.apk
