@@ -37,14 +37,12 @@ jobs:
 
           npx cap add android
 
-          if [ -f "assets/icon-only.png" ] && [ ! -f "assets/icon-foreground.png" ]; then
-            cp assets/icon-only.png assets/icon-foreground.png
-          fi
-          npx @capacitor/assets generate --android || true
-
+          # مجوزهای نوتیفیکیشن
           sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <application#' android/app/src/main/AndroidManifest.xml || true
 
           npx cap sync android
+
+          # بیلد نهایی فایل APK
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
@@ -54,4 +52,3 @@ jobs:
         with:
           name: dayflow-apk
           path: "**/android/app/build/outputs/apk/debug/app-debug.apk"
-          
