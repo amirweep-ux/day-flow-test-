@@ -14,16 +14,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Locate project directory and build
         run: |
-          # پیدا کردن مسیر دقیق فایلی که package.json در آن قرار دارد
           PKG_PATH=$(find . -name "package.json" -not -path "*/node_modules/*" | head -n 1)
           if [ -z "$PKG_PATH" ]; then
             echo "Error: package.json not found in repository!"
@@ -33,23 +32,18 @@ jobs:
           echo "Found project directory: $PROJECT_DIR"
           cd "$PROJECT_DIR"
 
-          # نصب پکیج‌ها و بیلد
           npm install
           npm run build
 
-          # افزودن پلتفرم اندروید
-          npx cap add android || true
+          npx cap add android
 
-          # آماده‌سازی آیکون
           if [ -f "assets/icon-only.png" ] && [ ! -f "assets/icon-foreground.png" ]; then
             cp assets/icon-only.png assets/icon-foreground.png
           fi
           npx @capacitor/assets generate --android || true
 
-          # مجوزهای نوتیفیکیشن
           sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <application#' android/app/src/main/AndroidManifest.xml || true
 
-          # همگام‌سازی و بیلد نهایی فایل APK
           npx cap sync android
           cd android
           chmod +x gradlew
@@ -60,3 +54,4 @@ jobs:
         with:
           name: dayflow-apk
           path: "**/android/app/build/outputs/apk/debug/app-debug.apk"
+          
